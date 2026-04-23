@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  darwin-install:
+    runs-on: macos-latest
+    steps:
+      - name: Install hermes-agent (macOS)
+        run: brew install ${{ github.repository_owner }}/hermes-agent/hermes-agent
+
+      - name: Verify install
+        run: which hermes && hermes version
+
+  linux-install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Install hermes-agent (Linux)
+        run: brew install ${{ github.repository_owner }}/hermes-agent/hermes-agent
+
+      - name: Verify install
+        run: which hermes && hermes version

@@ -1,0 +1,85 @@
+name: Update Formula
+
+on:
+  schedule:
+    - cron: "0 6 * * *"  # daily at 6 AM UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get latest hermes-agent release
+        id: release
+        run: |
+          LATEST=$(curl -sf https://api.github.com/repos/NousResearch/hermes-agent/releases/latest)
+          TAG=$(echo "$LATEST" | jq -r '.tag_name')
+          # Extract semver version from release title e.g. "Hermes Agent v0.11.0 (2026.4.23)"
+          VERSION=$(echo "$LATEST" | jq -r '.name' | grep -oP 'v\K[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Get current formula version
+        id: current
+        run: |
+          CURRENT=$(grep '^\s*version ' Formula/hermes-agent.rb | grep -oP '"[^"]+"' | tr -d '"')
+          echo "version=$CURRENT" >> $GITHUB_OUTPUT
+
+      - name: Check if update needed
+        id: check
+        run: |
+          if [ "${{ steps.release.outputs.version }}" != "${{ steps.current.outputs.version }}" ]; then
+            echo "needed=true" >> $GITHUB_OUTPUT
+            echo "New version: ${{ steps.release.outputs.version }} (was ${{ steps.current.outputs.version }})"
+          else
+            echo "needed=false" >> $GITHUB_OUTPUT
+            echo "Already up to date: ${{ steps.current.outputs.version }}"
+          fi
+
+      - name: Compute new sha256
+        if: steps.check.outputs.needed == 'true'
+        id: sha
+        run: |
+          TAG=${{ steps.release.outputs.tag }}
+          URL="https://github.com/NousResearch/hermes-agent/archive/refs/tags/${TAG}.tar.gz"
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          SHA=$(curl -sfL "$URL" | shasum -a 256 | awk '{print $1}')
+          echo "sha256=$SHA" >> $GITHUB_OUTPUT
+
+      - name: Update formula
+        if: steps.check.outputs.needed == 'true'
+        run: |
+          TAG=${{ steps.release.outputs.tag }}
+          VERSION=${{ steps.release.outputs.version }}
+          URL=${{ steps.sha.outputs.url }}
+          SHA=${{ steps.sha.outputs.sha256 }}
+
+          sed -i \
+            -e "s|url \".*hermes-agent/archive.*\"|url \"${URL}\"|" \
+            -e "s|sha256 \".*\"|sha256 \"${SHA}\"|" \
+            -e "s|version \".*\"|version \"${VERSION}\"|" \
+            Formula/hermes-agent.rb
+
+      - name: Open PR with update
+        if: steps.check.outputs.needed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: "update/hermes-agent-${{ steps.release.outputs.version }}"
+          commit-message: "hermes-agent ${{ steps.release.outputs.version }} (${{ steps.release.outputs.tag }})"
+          title: "Update hermes-agent to ${{ steps.release.outputs.version }} (${{ steps.release.outputs.tag }})"
+          body: |
+            Automated update to hermes-agent **${{ steps.release.outputs.version }}** (`${{ steps.release.outputs.tag }}`).
+
+            - URL: `${{ steps.sha.outputs.url }}`
+            - sha256: `${{ steps.sha.outputs.sha256 }}`
+
+            [Upstream release notes](https://github.com/NousResearch/hermes-agent/releases/tag/${{ steps.release.outputs.tag }})
+          labels: automated
