@@ -29,8 +29,8 @@ brew upgrade hermes-agent
 ## Notes
 
 - The formula targets Python 3.14 and installs into a virtualenv under `libexec`.
-- All Python dependencies are pinned as resource stanzas in the formula. Several packages (`cryptography`, `jiter`, `pydantic-core`, `socksio`) use pre-built wheels to avoid requiring a Rust compiler at build time.
-- When upgrading to a new hermes-agent release, run `brew update-python-resources hermes-agent` to refresh the resource stanzas, then manually swap any Rust-dependent packages back to their platform-specific wheels.
+- All Python dependencies are pinned as resource stanzas in the formula. Some packages (`jiter`, `pydantic-core`, `socksio`) use pre-built wheels to avoid broken sdists or extra build complexity, while `cryptography` is built from source.
+- The formula includes `rust` as a build dependency because `cryptography` is compiled from sdist. When upgrading to a new hermes-agent release, run `brew update-python-resources hermes-agent` to refresh the resource stanzas, then manually review any Rust-dependent packages and wheel overrides.
 - This tap tracks the latest tagged release. Check [upstream releases](https://github.com/NousResearch/hermes-agent/releases) for changelogs.
 
 ## Links

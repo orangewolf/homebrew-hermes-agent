@@ -4,10 +4,11 @@ class HermesAgent < Formula
   desc "Self-improving AI agent that creates skills from experience"
   homepage "https://hermes-agent.nousresearch.com"
   url "https://github.com/NousResearch/hermes-agent/archive/refs/tags/v2026.4.23.tar.gz"
+  version "0.11.0"
   sha256 "1ee1be80a2112b7edc581770cee8858e725ba110cc423979cd7102492504bc6b"
   license "MIT"
-  version "0.11.0"
 
+  depends_on "rust" => :build
   depends_on "libyaml"
   depends_on "python@3.14"
 
@@ -65,14 +66,8 @@ class HermesAgent < Formula
   end
 
   resource "cryptography" do
-    on_macos do
-      url "https://files.pythonhosted.org/packages/0b/5d/4a8f770695d73be252331e60e526291e3df0c9b27556a90a6b47bccca4c2/cryptography-46.0.7-cp311-abi3-macosx_10_9_universal2.whl"
-      sha256 "ea42cbe97209df307fdc3b155f1b6fa2577c0defa8f1f7d3be7d31d189108ad4"
-    end
-    on_linux do
-      url "https://files.pythonhosted.org/packages/2d/cf/054b9d8220f81509939599c8bdbc0c408dbd2bdd41688616a20731371fe0/cryptography-46.0.7-cp311-abi3-manylinux_2_28_x86_64.whl"
-      sha256 "420b1e4109cc95f0e5700eed79908cef9268265c773d3a66f7af1eef53d409ef"
-    end
+    url "https://files.pythonhosted.org/packages/47/93/ac8f3d5ff04d54bc814e961a43ae5b0b146154c89c61b47bb07557679b18/cryptography-46.0.7.tar.gz"
+    sha256 "e4cfd68c5f3e0bfdad0d38e023239b96a2fe84146481852dffbcca442c245aa5"
   end
 
   resource "distro" do
@@ -333,7 +328,7 @@ class HermesAgent < Formula
     venv = virtualenv_create(libexec, "python3.14")
 
     # Install wheel-only resources (pre-built to avoid Rust build dependency)
-    wheel_resources = %w[cryptography jiter pydantic-core socksio]
+    wheel_resources = %w[jiter pydantic-core socksio]
     resources.each do |r|
       if wheel_resources.include?(r.name)
         # Wheels have a hash-prefixed filename in the cache; symlink with a clean name so pip accepts it
@@ -356,9 +351,11 @@ class HermesAgent < Formula
 
       (bin/exe).write_env_script(
         libexec/"bin"/exe,
-        HERMES_BUNDLED_SKILLS: pkgshare/"skills",
-        HERMES_OPTIONAL_SKILLS: pkgshare/"optional-skills",
-        HERMES_MANAGED: "homebrew"
+        {
+          HERMES_BUNDLED_SKILLS:  pkgshare/"skills",
+          HERMES_OPTIONAL_SKILLS: pkgshare/"optional-skills",
+          HERMES_MANAGED:         "homebrew",
+        },
       )
     end
   end
