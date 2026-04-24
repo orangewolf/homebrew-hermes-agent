@@ -8,8 +8,6 @@ class HermesAgent < Formula
   license "MIT"
   version "0.11.0"
 
-  depends_on "certifi" => :no_linkage
-  depends_on "cryptography" => :no_linkage
   depends_on "libyaml"
   depends_on "python@3.14"
 
@@ -67,8 +65,14 @@ class HermesAgent < Formula
   end
 
   resource "cryptography" do
-    url "https://files.pythonhosted.org/packages/47/93/ac8f3d5ff04d54bc814e961a43ae5b0b146154c89c61b47bb07557679b18/cryptography-46.0.7.tar.gz"
-    sha256 "e4cfd68c5f3e0bfdad0d38e023239b96a2fe84146481852dffbcca442c245aa5"
+    on_macos do
+      url "https://files.pythonhosted.org/packages/0b/5d/4a8f770695d73be252331e60e526291e3df0c9b27556a90a6b47bccca4c2/cryptography-46.0.7-cp311-abi3-macosx_10_9_universal2.whl"
+      sha256 "ea42cbe97209df307fdc3b155f1b6fa2577c0defa8f1f7d3be7d31d189108ad4"
+    end
+    on_linux do
+      url "https://files.pythonhosted.org/packages/2d/cf/054b9d8220f81509939599c8bdbc0c408dbd2bdd41688616a20731371fe0/cryptography-46.0.7-cp311-abi3-manylinux_2_28_x86_64.whl"
+      sha256 "420b1e4109cc95f0e5700eed79908cef9268265c773d3a66f7af1eef53d409ef"
+    end
   end
 
   resource "distro" do
@@ -142,8 +146,20 @@ class HermesAgent < Formula
   end
 
   resource "jiter" do
-    url "https://files.pythonhosted.org/packages/6e/c1/0cddc6eb17d4c53a99840953f95dd3accdc5cfc7a337b0e9b26476276be9/jiter-0.14.0.tar.gz"
-    sha256 "e8a39e66dac7153cf3f964a12aad515afa8d74938ec5cc0018adcdae5367c79e"
+    on_macos do
+      on_intel do
+        url "https://files.pythonhosted.org/packages/4f/1e/354ed92461b165bd581f9ef5150971a572c873ec3b68a916d5aa91da3cc2/jiter-0.14.0-cp314-cp314-macosx_10_12_x86_64.whl"
+        sha256 "6f396837fc7577871ca8c12edaf239ed9ccef3bbe39904ae9b8b63ce0a48b140"
+      end
+      on_arm do
+        url "https://files.pythonhosted.org/packages/a6/95/8c7c7028aa8636ac21b7a55faef3e34215e6ed0cbf5ae58258427f621aa3/jiter-0.14.0-cp314-cp314-macosx_11_0_arm64.whl"
+        sha256 "a4d50ea3d8ba4176f79754333bd35f1bbcd28e91adc13eb9b7ca91bc52a6cef9"
+      end
+    end
+    on_linux do
+      url "https://files.pythonhosted.org/packages/50/02/3c05c1666c41904a2f607475a73e7a4763d1cbde2d18229c4f85b22dc253/jiter-0.14.0-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+      sha256 "80381f5a19af8fa9aef743f080e34f6b25ebd89656475f8cf0470ec6157052aa"
+    end
   end
 
   resource "markdown-it-py" do
@@ -207,8 +223,20 @@ class HermesAgent < Formula
   end
 
   resource "pydantic-core" do
-    url "https://files.pythonhosted.org/packages/2a/ef/f7abb56c49382a246fd2ce9c799691e3c3e7175ec74b14d99e798bcddb1a/pydantic_core-2.46.3.tar.gz"
-    sha256 "41c178f65b8c29807239d47e6050262eb6bf84eb695e41101e62e38df4a5bc2c"
+    on_macos do
+      on_intel do
+        url "https://files.pythonhosted.org/packages/7f/db/a7bcb4940183fda36022cd18ba8dd12f2dff40740ec7b58ce7457befa416/pydantic_core-2.46.3-cp314-cp314-macosx_10_12_x86_64.whl"
+        sha256 "afa3aa644f74e290cdede48a7b0bee37d1c35e71b05105f6b340d484af536d9b"
+      end
+      on_arm do
+        url "https://files.pythonhosted.org/packages/24/35/e4066358a22e3e99519db370494c7528f5a2aa1367370e80e27e20283543/pydantic_core-2.46.3-cp314-cp314-macosx_11_0_arm64.whl"
+        sha256 "ced3310e51aa425f7f77da8bbbb5212616655bedbe82c70944320bc1dbe5e018"
+      end
+    end
+    on_linux do
+      url "https://files.pythonhosted.org/packages/fd/86/ef96a4c6e79e7a2d0410826a68fbc0eccc0fd44aa733be199d5fcac3bb87/pydantic_core-2.46.3-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+      sha256 "ed42e6cc8e1b0e2b9b96e2276bad70ae625d10d6d524aed0c93de974ae029f9f"
+    end
   end
 
   resource "pygments" do
@@ -247,8 +275,8 @@ class HermesAgent < Formula
   end
 
   resource "socksio" do
-    url "https://files.pythonhosted.org/packages/f8/5c/48a7d9495be3d1c651198fd99dbb6ce190e2274d0f28b9051307bdec6b85/socksio-1.0.0.tar.gz"
-    sha256 "f88beb3da5b5c38b9890469de67d0cb0f9d494b78b106ca1845f96c10b91c4ac"
+    url "https://files.pythonhosted.org/packages/37/c3/6eeb6034408dac0fa653d126c9204ade96b819c936e136c5e8a6897eee9c/socksio-1.0.0-py3-none-any.whl"
+    sha256 "95dc1f15f9b34e8d7b16f06d74b8ccf48f609af32ab33c608d08761c5dcbb1f3"
   end
 
   resource "tabulate" do
@@ -303,7 +331,22 @@ class HermesAgent < Formula
 
   def install
     venv = virtualenv_create(libexec, "python3.14")
-    venv.pip_install resources
+
+    # Install wheel-only resources (pre-built to avoid Rust build dependency)
+    wheel_resources = %w[cryptography jiter pydantic-core socksio]
+    resources.each do |r|
+      if wheel_resources.include?(r.name)
+        # Wheels have a hash-prefixed filename in the cache; symlink with a clean name so pip accepts it
+        cached = r.cached_download
+        whl_name = cached.basename.to_s.sub(/\A[0-9a-f]{64}--/, "")
+        whl_path = buildpath/whl_name
+        ln_sf cached, whl_path
+        system libexec/"bin/python3.14", "-m", "pip", "install", "--no-deps", "--ignore-installed", whl_path
+      else
+        venv.pip_install r
+      end
+    end
+
     venv.pip_install buildpath
 
     pkgshare.install "skills", "optional-skills"
