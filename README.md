@@ -29,7 +29,8 @@ brew upgrade hermes-agent
 ## Notes
 
 - The formula targets Python 3.14 and installs into a virtualenv under `libexec`.
-- Resource stanzas (Python deps) are intentionally omitted from the formula source — run `brew update-python-resources --print-only hermes-agent` after tapping to populate them.
+- All Python dependencies are pinned as resource stanzas in the formula. Several packages (`cryptography`, `jiter`, `pydantic-core`, `socksio`) use pre-built wheels to avoid requiring a Rust compiler at build time.
+- When upgrading to a new hermes-agent release, run `brew update-python-resources hermes-agent` to refresh the resource stanzas, then manually swap any Rust-dependent packages back to their platform-specific wheels.
 - This tap tracks the latest tagged release. Check [upstream releases](https://github.com/NousResearch/hermes-agent/releases) for changelogs.
 
 ## Links
