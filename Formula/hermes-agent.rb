@@ -344,6 +344,18 @@ class HermesAgent < Formula
 
     venv.pip_install buildpath
 
+    # Pre-set dylib IDs for pre-built wheel extensions so Homebrew's post-install
+    # relocation finds them already correct and skips modification. Without this,
+    # ruby-macho fails on arm64 when the wheel's build-path ID is shorter than the
+    # Cellar path and there's no room in the Mach-O header to extend it.
+    if OS.mac?
+      libexec.glob("lib/python*/site-packages/**/*.so").each do |so|
+        system "install_name_tool", "-id", so.to_s, so.to_s
+        # arm64 binaries must be re-signed after any Mach-O modification
+        system "/usr/bin/codesign", "--force", "--sign", "-", so.to_s if Hardware::CPU.arm?
+      end
+    end
+
     pkgshare.install "skills", "optional-skills"
 
     %w[hermes hermes-agent hermes-acp].each do |exe|
